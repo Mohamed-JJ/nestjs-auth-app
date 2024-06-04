@@ -1,0 +1,13 @@
+version: '3.1'
+services:
+  postgres:
+    image: postgres:9.6
+    restart: always
+    env_file:
+      - ./back/.env
+    # environment:
+    #   POSTGRES_PASSWORD: auth1324
+    #   POSTGRES_USER: admin
+    #   POSTGRES_DB: userAuthDb
+    ports:
+      - 5432:5432
