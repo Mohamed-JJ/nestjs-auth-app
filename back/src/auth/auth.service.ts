@@ -5,6 +5,7 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -13,8 +14,11 @@ export class AuthService {
     private prisma: PrismaService,
   ) {}
 
-  async signIn(createAuthDto: UpdateUserDto) {
-    return 'This action adds a new auth';
+  async signIn(createAuthDto: UpdateUserDto): Promise<User> {
+    const foundUser = await this.prisma.user.findUnique({
+      where: { email: createAuthDto.email },
+    });
+    return foundUser;
   }
 
   async signUp(createAuthDto: CreateUserDto): Promise<User> {
