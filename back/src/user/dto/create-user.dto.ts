@@ -1,9 +1,6 @@
-import { User } from '@prisma/client';
 import { IsEmail, IsNotEmpty, Matches } from 'class-validator';
 
-export class CreateUserDto implements User {
-  id: number;
-
+export class CreateUserDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;

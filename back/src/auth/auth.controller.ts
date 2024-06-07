@@ -9,20 +9,23 @@ import {
   Delete,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { UpdateUserDto } from 'src/user/dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signIn')
-  login(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.signIn(createAuthDto);
+  async login(@Body() User: UpdateUserDto) {
+    return this.authService.signIn(User);
   }
 
   @Post('signUp')
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.signUp(createAuthDto);
+  async signUp(@Body() User: CreateUserDto) {
+    // hash the password before saving it, hashSync is used for simplicity and for instant hashing
+    User.password = bcrypt.hashSync(User.password, 10);
+    return this.authService.signUp(User);
   }
 }
