@@ -11,7 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
   constructor(
     private usersService: UserService,
-    private prisma: PrismaService,
+    public prisma: PrismaService,
   ) {}
 
   async signIn(createAuthDto: UpdateUserDto): Promise<User> {

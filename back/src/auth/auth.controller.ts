@@ -10,6 +10,7 @@ import {
   HttpException,
   HttpStatus,
   Res,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -46,6 +47,27 @@ export class AuthController {
       return { message: 'success' };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Get('/SessionUser')
+  //the front end will make an api call to this function for the context of the user
+  async getUser(@Req() req: any) {
+    try {
+      const cookie = req.cookies['jwt'];
+      // this function is used to verify the jwt token if it is valid or not
+      const data = await this.jwtService.verifyAsync(cookie);
+      if (!data) {
+        throw new HttpException('Not Authorized', HttpStatus.UNAUTHORIZED);
+      }
+      const user = await this.authService.prisma.user.findUnique({
+        where: { id: data.id },
+      });
+      // return the id of the user to the frontend to use the id to fetch the user data from the database
+      const { password, ...ret } = user;
+      return ret;
+    } catch (error) {
+      throw error;
     }
   }
 
