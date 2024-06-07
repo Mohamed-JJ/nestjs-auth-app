@@ -75,6 +75,14 @@ export class AuthController {
   async signUp(@Body() User: CreateUserDto) {
     // hash the password before saving it, hashSync is used for simplicity and for instant hashing
     User.password = bcrypt.hashSync(User.password, 10);
-    return this.authService.signUp(User);
+    const found = await this.authService.signUp(User);
+    const { password, ...ret } = found;
+    return ret;
+  }
+
+  @Post('/logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('jwt');
+    return { message: 'success' };
   }
 }
