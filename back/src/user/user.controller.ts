@@ -7,6 +7,8 @@ import {
   Patch,
   Param,
   Delete,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,14 +17,15 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
   @Get()
-  getAll() {
-    return this.userService.findAll();
+  async getAll() {
+    return await this.userService.findAll();
+  }
+  @Get('/:id')
+  async getOne(@Param('id') id: string) {
+    const user = await this.userService.findOneById(+id);
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    const { password, ...result } = user;
+    return result;
   }
 }

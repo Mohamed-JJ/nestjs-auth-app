@@ -19,9 +19,18 @@ export class UserService {
     return await this.Prisma.user.findMany();
     // return `This action returns all user`;
   }
+  async findSome(filter) {
+    return await this.Prisma.user.findMany({ where: filter });
+  }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOneById(id: number) {
+    return await this.Prisma.user.findUnique({ where: { id: id } });
+  }
+  async findOneByusername(username: string) {
+    return await this.Prisma.user.findUnique({ where: { username: username } });
+  }
+  async findOneByemail(email: string) {
+    return await this.Prisma.user.findUnique({ where: { email: email } });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

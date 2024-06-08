@@ -7,7 +7,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @Matches(/^[a-zA-Z0-9_]*$/, {})
-  name: string;
+  username: string;
 
   @Matches(/^[a-zA-Z0-9_]*$/, {})
   @IsNotEmpty()

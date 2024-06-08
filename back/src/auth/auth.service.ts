@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -14,17 +15,33 @@ export class AuthService {
     public prisma: PrismaService,
   ) {}
 
-  async signIn(createAuthDto: UpdateUserDto): Promise<User> {
-    const foundUser = await this.prisma.user.findUnique({
-      where: { email: createAuthDto.email },
-    });
-    return foundUser;
+  async register(u: CreateUserDto) {
+    const checkUserName = await this.usersService.findOneByusername(u.username);
+    const checkUserEmail = await this.usersService.findOneByemail(u.email);
+    if (checkUserName) {
+      throw new HttpException(
+        'Username already exists',
+        HttpStatus.BAD_REQUEST,
+      );
+    } else if (checkUserEmail) {
+      throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
+    }
+    u.password = await bcrypt.hash(u.password, 10);
+    const createdUser = await this.usersService.create(u);
+    const { password, ...result } = createdUser;
+    return result;
   }
 
-  async signUp(createAuthDto: CreateUserDto): Promise<User> {
-    const CreatedUser = await this.prisma.user.create({
-      data: { ...createAuthDto },
-    });
-    return CreatedUser;
+  async login(username: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOneByusername(username);
+    if (user && (await bcrypt.compare(pass, user.password))) {
+      const { password, ...result } = user;
+      console.log(result);
+      return result;
+    }
+    throw new HttpException(
+      'Invalid username/password',
+      HttpStatus.UNAUTHORIZED,
+    );
   }
 }
