@@ -17,8 +17,17 @@ export class AuthController {
 
   @UseGuards(LocalGuard)
   @Post('/login')
-  async login(@Body() userInfo: UpdateUserDto, @Req() res: Request) {
-    return await this.authService.Login(res.user as User);
+  async login(
+    @Body() userInfo: UpdateUserDto,
+    @Req() res: Request,
+    @Res({ passthrough: true }) req: Response,
+  ) {
+    const ret = await this.authService.Login(res.user as User);
+    req.cookie('access_token', ret.access_token, {
+      httpOnly: true,
+      secure: false,
+    });
+    return res.user;
   }
 
   @Post('/register')
@@ -29,5 +38,10 @@ export class AuthController {
     } catch (error) {
       throw error;
     }
+  }
+  @Post('/logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('access_token');
+    return { message: 'success' };
   }
 }
