@@ -9,14 +9,18 @@ import {
   Delete,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+  @UseGuards(JwtGuard)
   @Get()
   async getAll() {
     return await this.userService.findAll();

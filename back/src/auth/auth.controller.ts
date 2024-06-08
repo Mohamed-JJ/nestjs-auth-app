@@ -6,6 +6,7 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import { LocalGuard } from './guards/local-guard';
 import { Request, Response } from 'express';
+import { User } from '@prisma/client';
 
 @Controller('/auth')
 export class AuthController {
@@ -17,7 +18,7 @@ export class AuthController {
   @UseGuards(LocalGuard)
   @Post('/login')
   async login(@Body() userInfo: UpdateUserDto, @Req() res: Request) {
-    return res.user;
+    return await this.authService.Login(res.user as User);
   }
 
   @Post('/register')

@@ -13,6 +13,7 @@ export class AuthService {
   constructor(
     private usersService: UserService,
     public prisma: PrismaService,
+    private jwtService: JwtService,
   ) {}
 
   async register(u: CreateUserDto) {
@@ -35,7 +36,7 @@ export class AuthService {
   async login(username: string, pass: string): Promise<any> {
     const user = await this.usersService.findOneByusername(username);
     if (user && (await bcrypt.compare(pass, user.password))) {
-      const { password, ...result } = user;
+      const { password, googleId, ...result } = user;
       console.log(result);
       return result;
     }
@@ -43,5 +44,13 @@ export class AuthService {
       'Invalid username/password',
       HttpStatus.UNAUTHORIZED,
     );
+  }
+
+  async Login(user: User) {
+    const payload = { username: user.username, sub: user.id };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }

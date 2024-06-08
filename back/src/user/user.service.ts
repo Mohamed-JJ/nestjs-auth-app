@@ -16,8 +16,14 @@ export class UserService {
   }
 
   async findAll() {
-    return await this.Prisma.user.findMany();
-    // return `This action returns all user`;
+    return await this.Prisma.user.findMany({
+      select: {
+        id: true,
+        password: false,
+        googleId: false,
+        email: true,
+        username: true,
+    }});
   }
   async findSome(filter) {
     return await this.Prisma.user.findMany({ where: filter });
